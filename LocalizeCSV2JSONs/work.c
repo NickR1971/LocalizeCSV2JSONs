@@ -85,34 +85,10 @@ static void CreateOutputFiles()
 
 }
 
-static void CloseAll()
-{
-	int i;
-
-	for (i = 0; i < langCount; i++)
-	{
-		if (fpOut[i] != NULL)
-		{
-			fputs("{ \"key\": \"core_empty\", \"value\": \"\" }\n] }", fpOut[i]);
-			fclose(fpOut[i]);
-		}
-	}
-	fclose(fp);
-}
-
-void work(const char* _filename)
+static void ScanString()
 {
 	int i, curLang;
 	char c;
-
-	if (IsOpenCSV(_filename)==0)
-	{		
-		return;
-	}
-	
-	SetLangCount();
-
-	CreateOutputFiles();
 
 	while (fgets(str, MAX_STR, fp))
 	{
@@ -148,10 +124,40 @@ l_next:
 				}
 			}
 			str[i++] = 0;
-			if (c == '\"' && str[i]==',') i++;
-			fprintf(fpOut[curLang],"{ \"key\": \"%s\", \"value\": \"%s\" },\n", str, value);
+			if (c == '\"' && str[i] == ',') i++;
+			fprintf(fpOut[curLang], "{ \"key\": \"%s\", \"value\": \"%s\" },\n", str, value);
 		}
 	}
+
+}
+
+static void CloseAll()
+{
+	int i;
+
+	for (i = 0; i < langCount; i++)
+	{
+		if (fpOut[i] != NULL)
+		{
+			fputs("{ \"key\": \"core_empty\", \"value\": \"\" }\n] }", fpOut[i]);
+			fclose(fpOut[i]);
+		}
+	}
+	fclose(fp);
+}
+
+void work(const char* _filename)
+{
+	if (IsOpenCSV(_filename)==0)
+	{		
+		return;
+	}
+	
+	SetLangCount();
+
+	CreateOutputFiles();
+
+	ScanString();
 
 	CloseAll();
 }
